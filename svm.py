@@ -39,3 +39,73 @@ class SVM:
     accuracy = np.sum(y_pred == y_test) / X_test.shape[0]
     print("Accuracy: {}".format(accuracy))
     return accuracy
+
+
+class SoftMarginSVM:
+  def __init__(self, X, y, l=0):
+    self.X = X
+    self.N = X.shape[0]   # num_points
+    self.d = X.shape[1]   # num_features
+    self.y = y
+    self.y[np.where(y == 0)] = -1
+    self.W = 0
+    self.b = 0
+    self.l = l
+  
+  def loss(self):
+    z = 1 - self.y * (self.X.dot(self.W) + self.b)
+    return np.mean(np.maximum(0, z) + self.l/2 * self.W.T.dot(self.W))
+  
+  def grad(self, X, y):
+    z = 1 - y * (X.dot(self.W) + self.b)
+    loss_set = np.where(z >= 0)
+    grad_W = np.sum(-y[loss_set].reshape(-1, 1) * X[loss_set], axis=0).T/X.shape[0] + self.l*self.W
+    grad_b = np.sum(-y[loss_set])/X.shape[0]
+    return grad_W, grad_b
+  
+  def fit(self, lr=0.01, nepoches=50, batch_size=10, hist=False):
+    self.W = np.random.randn(self.d)
+    self.b = np.random.randn()
+    W_old = self.W.copy()
+    b_old = self.b
+    ep = 0
+    nbatches = int(np.ceil(float(self.N) / batch_size))
+    loss_hist = [self.loss()]
+    while ep < nepoches:
+      ep += 1
+      mix_ids = np.random.permutation(self.N)
+      for i in range(nbatches):
+        batch_ids = mix_ids[i*batch_size : min((i+1)*batch_size, self.N)]
+        X_batch, y_batch = self.X[batch_ids], self.y[batch_ids]
+        grad_W, grad_b = self.grad(X_batch, y_batch)
+        self.W = self.W - lr*grad_W
+        self.b -= lr*grad_b
+      loss = self.loss()
+      loss_hist.append(loss)
+      if hist:
+        print("Epoch: {}\tLoss: {}".format(ep, loss))
+      if np.linalg.norm(self.W - W_old) == 0 and self.b - b_old == 0:
+        break
+      W_old = self.W.copy()
+      b_old = self.b
+    return self.W, self.b, loss_hist
+
+  def pred(self, X):
+    res = X.dot(self.W) + self.b
+    res[np.where(res >= 0)] = 1
+    res[np.where(res < 0)] = 0
+    return res
+  
+  def plot(self, loss_hist):
+    eps = range(len(loss_hist))
+    plt.figure(figsize=(10, 8))
+    plt.plot(eps, loss_hist)
+    plt.xlabel("Epoches")
+    plt.ylabel("Loss")
+    plt.show()
+  
+  def test(self, X_test, y_test):
+    y_pred = self.pred(X_test)
+    accuracy = np.sum(y_pred == y_test) / X_test.shape[0]
+    print("Accuracy: {}".format(accuracy))
+    return accuracy

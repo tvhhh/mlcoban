@@ -19,7 +19,7 @@ class LogisticRegression:
   
   def loss(self):
     a = self.prob(self.X)
-    return -np.mean(self.y*np.log(a) + (1-self.y)*np.log(1-a) - self.l/2*(np.linalg.norm(self.W)**2))
+    return -np.mean(self.y*np.log(a) + (1-self.y)*np.log(1-a) - self.l/2 * self.W.T.dot(self.W))
   
   def grad(self, X, y):
     a = self.prob(X)
