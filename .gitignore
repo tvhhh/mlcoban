@@ -1,3 +1,11 @@
+# Py cache
 __pycache__/
+
+# Vscode stuff
 .vscode/
+
+# Datasets (large files)
 datasets/
+
+# Sth bullsh*t
+src/__init__.py

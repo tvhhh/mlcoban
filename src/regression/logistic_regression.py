@@ -51,6 +51,7 @@ class LogisticRegression:
     eps = range(len(loss_hist))
     plt.figure(figsize=(10, 8))
     plt.plot(eps, loss_hist)
+    plt.title("Logistic Regression loss")
     plt.xlabel("Epoches")
     plt.ylabel("Loss")
     plt.show()

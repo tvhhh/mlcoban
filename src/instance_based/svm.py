@@ -42,7 +42,7 @@ class SVM:
 
 
 class SoftMarginSVM:
-  def __init__(self, X, y, l=0):
+  def __init__(self, X, y, l=0.1):
     self.X = X
     self.N = X.shape[0]   # num_points
     self.d = X.shape[1]   # num_features
@@ -54,11 +54,11 @@ class SoftMarginSVM:
   
   def loss(self):
     z = 1 - self.y * (self.X.dot(self.W) + self.b)
-    return np.mean(np.maximum(0, z) + self.l/2 * self.W.T.dot(self.W))
+    return np.mean(np.maximum(0, z)) + self.l/2*self.W.T.dot(self.W)
   
   def grad(self, X, y):
-    z = 1 - y * (X.dot(self.W) + self.b)
-    loss_set = np.where(z >= 0)
+    h = 1 - y * (X.dot(self.W) + self.b)
+    loss_set = np.where(h >= 0)
     grad_W = np.sum(-y[loss_set].reshape(-1, 1) * X[loss_set], axis=0).T/X.shape[0] + self.l*self.W
     grad_b = np.sum(-y[loss_set])/X.shape[0]
     return grad_W, grad_b
@@ -90,19 +90,20 @@ class SoftMarginSVM:
       b_old = self.b
     return self.W, self.b, loss_hist
 
+  def plot(self, loss_hist):
+    eps = range(len(loss_hist))
+    plt.figure(figsize=(10, 8))
+    plt.plot(eps, loss_hist)
+    plt.title("Soft-margin SVM loss")
+    plt.xlabel("Epoches")
+    plt.ylabel("Loss")
+    plt.show()
+
   def pred(self, X):
     res = X.dot(self.W) + self.b
     res[np.where(res >= 0)] = 1
     res[np.where(res < 0)] = 0
     return res
-  
-  def plot(self, loss_hist):
-    eps = range(len(loss_hist))
-    plt.figure(figsize=(10, 8))
-    plt.plot(eps, loss_hist)
-    plt.xlabel("Epoches")
-    plt.ylabel("Loss")
-    plt.show()
   
   def test(self, X_test, y_test):
     y_pred = self.pred(X_test)
