@@ -1,4 +1,4 @@
-# Py cache
+# Pycache
 __pycache__/
 
 # Ipynb checkpoints
@@ -6,9 +6,6 @@ __pycache__/
 
 # Vscode stuff
 .vscode/
-
-# Datasets (large files)
-datasets/
 
 # Sth bullsh*t
 src/__init__.py
