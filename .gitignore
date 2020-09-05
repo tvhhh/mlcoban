@@ -1,6 +1,9 @@
 # Py cache
 __pycache__/
 
+# Ipynb checkpoints
+.ipynb_checkpoints/
+
 # Vscode stuff
 .vscode/
 
